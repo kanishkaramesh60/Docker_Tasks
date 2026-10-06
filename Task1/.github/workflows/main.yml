@@ -1,13 +1,25 @@
-name: Node.js CI/CD
+name: Task1 Node.js CI/CD
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'Task1/**'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Task1/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Task1
 
     steps:
       - name: Checkout code
@@ -39,6 +51,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
+        working-directory: Task1
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/docker:latest .
 
       - name: Push Docker image
