@@ -1,0 +1,10 @@
+# Node.js
+Task1/node_modules/
+
+# Terraform
+Task3/.terraform/
+Task3/*.tfstate
+Task3/*.tfstate.*
+
+# General
+*.log

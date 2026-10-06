@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                bat 'docker build -t jenkins-cicd-app .'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'docker run --rm jenkins-cicd-app nginx -t'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                bat 'docker stop jenkins-cicd-app-container || exit 0'
+                bat 'docker rm jenkins-cicd-app-container || exit 0'
+                bat 'docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app'
+            }
+        }
+    }
+}
