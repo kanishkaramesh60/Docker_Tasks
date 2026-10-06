@@ -1,156 +1,699 @@
-# Task 1 – Node.js CI/CD with Docker
+# Task 1 – Automate Code Deployment Using CI/CD Pipeline
 
-## 📌 Overview
+## 📌 Objective
 
-This task demonstrates a basic **CI/CD pipeline for a Node.js application** using **GitHub Actions and Docker**.
+To set up a Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions to automatically build, test, and deploy a Node.js web application using Docker.
 
-The application is automatically tested, containerized, and pushed to Docker Hub whenever changes are made to the `Task1` folder.
+---
 
-## 🛠️ Technologies Used
+## 🛠️ Tools and Technologies
 
-- Node.js
-- npm
-- Docker
-- Docker Hub
-- GitHub
-- GitHub Actions
+| Tool / Technology | Purpose |
+|---|---|
+| GitHub | Source code management |
+| GitHub Actions | CI/CD automation |
+| Node.js | Application runtime |
+| Docker | Application containerization |
+| Docker Hub | Docker image storage and distribution |
+
+---
 
 ## 📂 Project Structure
 
 ```text
 Task1/
-├── app.js
-├── Dockerfile
+│
+├── .github/
+│   └── workflows/
+│       └── main.yml
+│
 ├── package.json
-├── package-lock.json
+├── server.js
+├── Dockerfile
 └── README.md
 ```
 
-## 🔄 CI/CD Workflow
+---
+
+## 🔄 CI/CD Pipeline Workflow
+
+The pipeline is triggered automatically whenever code is pushed to the `main` branch.
 
 ```text
-Developer pushes code
-        ↓
-GitHub Repository
-        ↓
-GitHub Actions
-        ↓
-Install Node.js dependencies
-        ↓
-Check Node.js application
-        ↓
-Build Docker image
-        ↓
-Login to Docker Hub
-        ↓
-Push Docker image
-        ↓
-Docker Hub
+                    Developer
+                        |
+                        v
+                 Push Code to GitHub
+                        |
+                        v
+                GitHub Actions Triggered
+                        |
+                        v
+                 Checkout Source Code
+                        |
+                        v
+                 Setup Node.js
+                        |
+                        v
+                Install Dependencies
+                        |
+                        v
+                    Run Tests
+                        |
+                        v
+                Build Docker Image
+                        |
+                        v
+                Login to Docker Hub
+                        |
+                        v
+             Push Image to Docker Hub
+                        |
+                        v
+                    Deployment
 ```
 
-## ⚙️ GitHub Actions
+---
 
-The CI/CD workflow is located at:
+## ⚙️ GitHub Actions Workflow
+
+The CI/CD workflow is defined in:
 
 ```text
-.github/workflows/task1.yml
+.github/workflows/main.yml
 ```
 
-The workflow is configured to run only when files inside the `Task1/` folder are changed.
+The workflow performs the following operations:
 
-```yaml
-paths:
-  - 'Task1/**'
-```
+1. Checks out the source code from GitHub.
+2. Sets up the Node.js environment.
+3. Installs the required dependencies.
+4. Runs application tests.
+5. Builds the Docker image.
+6. Logs in to Docker Hub using GitHub Secrets.
+7. Pushes the Docker image to Docker Hub.
 
-### Pipeline Stages
+The workflow is configured to run automatically when changes are pushed to the `main` branch.
 
-1. **Checkout Repository**
-2. **Setup Node.js**
-3. **Install Dependencies**
-4. **Validate Node.js Application**
-5. **Build Docker Image**
-6. **Login to Docker Hub**
-7. **Push Docker Image**
+---
 
-The Node.js application is validated using:
+## 🔧 CI/CD Pipeline Stages
 
-```cmd
-node --check app.js
-```
+### 1. Source Code
+
+The Node.js application source code is maintained in the GitHub repository.
+
+### 2. Build
+
+GitHub Actions installs the required Node.js dependencies and prepares the application.
+
+### 3. Test
+
+The application tests are executed automatically to verify that the application is working correctly.
+
+### 4. Docker Build
+
+After successful testing, a Docker image is created using the project's `Dockerfile`.
+
+### 5. Docker Hub Login
+
+GitHub Actions securely authenticates with Docker Hub using GitHub Secrets.
+
+### 6. Docker Image Push
+
+The successfully built Docker image is pushed to Docker Hub.
+
+### 7. Deployment
+
+The Docker image stored in Docker Hub can be pulled and deployed on a Docker-supported environment.
+
+---
 
 ## 🐳 Docker
 
-The application is containerized using the `Dockerfile`.
+Docker is used to containerize the Node.js application.
 
-The Docker image is pushed to:
+The `Dockerfile` contains the instructions required to create the Docker image.
+
+Example Docker workflow:
 
 ```text
-kanishka63/docker:latest
+Node.js Application
+        |
+        v
+    Dockerfile
+        |
+        v
+   Docker Build
+        |
+        v
+  Docker Image
+        |
+        v
+   Docker Hub
 ```
 
-## ▶️ Run Locally
+The Docker image can be pulled using:
 
-Clone the repository:
-
-```cmd
-git clone https://github.com/kanishkaramesh60/Devops_Tasks.git
+```bash
+docker pull kanishka63/docker:latest
 ```
 
-Navigate to Task1:
-
-```cmd
-cd Devops_Tasks\Task1
-```
-
-Install dependencies:
-
-```cmd
-npm install
-```
-
-Run the application:
-
-```cmd
-node app.js
-```
-
-## 🐳 Build and Run with Docker
-
-Build the Docker image:
-
-```cmd
-docker build -t kanishka63/docker:latest .
-```
-
-Run the Docker container:
-
-```cmd
-docker run -p 3000:3000 kanishka63/docker:latest
-```
+---
 
 ## 🔐 GitHub Secrets
 
-The GitHub Actions workflow uses the following repository secrets:
+Sensitive Docker Hub credentials are stored using **GitHub Secrets** instead of writing them directly inside the workflow file.
+
+The following secrets are used:
 
 ```text
 DOCKER_USERNAME
 DOCKER_PASSWORD
 ```
 
-These credentials are used to authenticate with Docker Hub before pushing the Docker image.
+The workflow accesses these values using:
 
-> **Note:** The Docker Hub password should be stored as a GitHub Secret or Docker Hub Personal Access Token. Never hard-code credentials in the workflow.
+```yaml
+${{ secrets.DOCKER_USERNAME }}
+```
 
-## ✅ Result
+and:
 
-The Task1 CI/CD pipeline successfully:
+```yaml
+${{ secrets.DOCKER_PASSWORD }}
+```
 
-- ✅ Validates the Node.js application
-- ✅ Builds the Docker image
-- ✅ Authenticates with Docker Hub
-- ✅ Pushes the Docker image to Docker Hub automatically
+Using GitHub Secrets helps prevent sensitive credentials from being exposed in the source code.
 
-### 🎯 Task 1 Status
+---
 
-**Task 1 CI/CD: Completed ✅**
+## 🌐 Docker Hub
+
+The Docker image generated by the CI/CD pipeline is pushed to Docker Hub.
+
+Docker Hub repository:
+
+```text
+kanishka63/docker
+```
+
+Image:
+
+```text
+kanishka63/docker:latest
+```
+
+The image can be downloaded using:
+
+```bash
+docker pull kanishka63/docker:latest
+```
+
+---
+
+# 🎯 Key Concepts Learned
+
+## Continuous Integration
+
+Continuous Integration (CI) is the practice of automatically building and testing application code whenever developers make changes to a shared repository.
+
+It helps identify errors early in the development process.
+
+---
+
+## Continuous Deployment
+
+Continuous Deployment (CD) automates the process of delivering successfully tested application changes to a deployment environment.
+
+---
+
+## GitHub Actions
+
+GitHub Actions is a workflow automation and CI/CD platform integrated with GitHub.
+
+It allows developers to automatically perform tasks such as:
+
+- Building applications
+- Running tests
+- Building Docker images
+- Publishing Docker images
+- Deploying applications
+
+---
+
+## Docker
+
+Docker is a containerization platform used to package an application together with its dependencies.
+
+This helps the application run consistently across different environments.
+
+---
+
+# 🎓 Interview Questions and Answers
+
+## 1. What is CI/CD?
+
+CI/CD stands for **Continuous Integration and Continuous Delivery/Deployment**.
+
+### Continuous Integration
+
+Continuous Integration automatically builds and tests code whenever changes are pushed to a shared repository.
+
+### Continuous Delivery
+
+Continuous Delivery automatically prepares successfully tested code for release.
+
+### Continuous Deployment
+
+Continuous Deployment automatically deploys successfully tested code to the target environment.
+
+### Example
+
+```text
+Code Push
+    |
+    v
+Build
+    |
+    v
+Test
+    |
+    v
+Docker Build
+    |
+    v
+Docker Hub
+    |
+    v
+Deployment
+```
+
+---
+
+## 2. How do GitHub Actions work?
+
+GitHub Actions is used to automate tasks within a GitHub repository.
+
+Workflows are defined using YAML files inside:
+
+```text
+.github/workflows/
+```
+
+For example:
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+```
+
+When code is pushed to the `main` branch, GitHub detects the event and starts the workflow.
+
+The workflow then executes the configured jobs and steps on a runner.
+
+---
+
+## 3. What are runners?
+
+A **runner** is the machine that executes GitHub Actions jobs.
+
+GitHub provides different hosted runners, such as:
+
+```text
+ubuntu-latest
+windows-latest
+macos-latest
+```
+
+For example:
+
+```yaml
+runs-on: ubuntu-latest
+```
+
+means that the job will execute on a GitHub-hosted Ubuntu runner.
+
+---
+
+## 4. What is the difference between jobs and steps?
+
+### Job
+
+A **job** is a group of steps that are executed on a runner.
+
+Example:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+```
+
+### Step
+
+A **step** is an individual operation inside a job.
+
+Example:
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - run: npm install
+
+  - run: npm test
+```
+
+### Difference
+
+| Jobs | Steps |
+|---|---|
+| Group multiple operations | Individual operations |
+| Execute on a runner | Execute inside a job |
+| Can run independently or in parallel | Usually execute sequentially |
+| Can have dependencies | Belong to a job |
+
+---
+
+## 5. How do you secure secrets in GitHub Actions?
+
+Sensitive information such as passwords, API keys, access tokens, and Docker Hub credentials should not be hard-coded into workflow files.
+
+GitHub Secrets can be used to securely store such information.
+
+For example:
+
+```text
+DOCKER_USERNAME
+DOCKER_PASSWORD
+```
+
+They can be accessed in a workflow using:
+
+```yaml
+${{ secrets.DOCKER_USERNAME }}
+```
+
+and:
+
+```yaml
+${{ secrets.DOCKER_PASSWORD }}
+```
+
+This prevents credentials from being directly exposed in the repository.
+
+---
+
+## 6. How do you handle deployment errors?
+
+Deployment errors can be handled using the following process:
+
+1. Check the GitHub Actions workflow logs.
+2. Identify the step where the failure occurred.
+3. Check the error message.
+4. Verify application configuration.
+5. Verify GitHub Secrets and credentials.
+6. Check Docker build errors.
+7. Test the application and Docker image locally.
+8. Fix the problem.
+9. Push the changes and run the pipeline again.
+
+A good CI/CD pipeline should stop when a critical stage fails rather than deploying a broken application.
+
+---
+
+## 7. Explain the Docker build-push workflow.
+
+The Docker build-push workflow consists mainly of two operations.
+
+### Docker Build
+
+A Docker image is created using the `Dockerfile`.
+
+```bash
+docker build -t username/image:latest .
+```
+
+### Docker Push
+
+The generated image is uploaded to Docker Hub.
+
+```bash
+docker push username/image:latest
+```
+
+The complete process is:
+
+```text
+Source Code
+     |
+     v
+ Dockerfile
+     |
+     v
+Docker Build
+     |
+     v
+Docker Image
+     |
+     v
+Docker Hub
+```
+
+In this task, GitHub Actions automates this process.
+
+---
+
+## 8. How can you test a CI/CD pipeline locally?
+
+Although the complete GitHub Actions environment runs on GitHub-hosted runners, individual pipeline steps can be tested locally.
+
+For a Node.js application:
+
+```bash
+npm install
+```
+
+Run tests:
+
+```bash
+npm test
+```
+
+Run the application:
+
+```bash
+npm start
+```
+
+The Docker image can also be tested locally:
+
+```bash
+docker build -t nodejs-demo-app .
+```
+
+Run the container:
+
+```bash
+docker run -p 3000:3000 nodejs-demo-app
+```
+
+Testing locally helps identify problems before pushing changes to GitHub.
+
+---
+
+## 9. What happens when code is pushed to the main branch?
+
+When code is pushed to the configured `main` branch, GitHub Actions automatically starts the workflow.
+
+The process is:
+
+```text
+Git Push
+    |
+    v
+GitHub Detects Push
+    |
+    v
+GitHub Actions Starts
+    |
+    v
+Checkout Code
+    |
+    v
+Setup Node.js
+    |
+    v
+Install Dependencies
+    |
+    v
+Run Tests
+    |
+    v
+Build Docker Image
+    |
+    v
+Login to Docker Hub
+    |
+    v
+Push Docker Image
+    |
+    v
+Deployment
+```
+
+If any important step fails, the workflow reports the failure and the later stages are not executed.
+
+---
+
+# 📊 Task Outcome
+
+By completing this task, the following concepts were demonstrated:
+
+- GitHub repository management
+- GitHub Actions
+- CI/CD pipeline automation
+- Node.js application development
+- Automated testing
+- Docker containerization
+- Docker image creation
+- Docker Hub integration
+- GitHub Secrets
+- Automated image deployment
+
+---
+
+# 📦 Deliverables
+
+- ✅ Node.js sample web application
+- ✅ `Dockerfile`
+- ✅ GitHub Actions workflow
+- ✅ CI/CD pipeline
+- ✅ Automated testing
+- ✅ Docker image build
+- ✅ Docker Hub integration
+- ✅ GitHub Secrets configuration
+- ✅ README documentation
+- ✅ Interview questions and answers
+
+---
+
+# 🧪 Sample Pipeline
+
+The overall implementation can be represented as:
+
+```text
+                 GitHub Repository
+                        |
+                        v
+                Push to main branch
+                        |
+                        v
+                 GitHub Actions
+                        |
+             +----------+----------+
+             |                     |
+             v                     v
+       Install Dependencies     Setup Node.js
+             |                     |
+             +----------+----------+
+                        |
+                        v
+                    Run Tests
+                        |
+                  Tests Passed?
+                   /        \
+                 No          Yes
+                 |            |
+                 v            v
+              Stop       Build Docker
+                              |
+                              v
+                       Login to Docker Hub
+                              |
+                              v
+                       Push Docker Image
+                              |
+                              v
+                           Deploy
+```
+
+---
+
+# 📁 Dataset / Repository
+
+The sample application used for this task is:
+
+```text
+nodejs-demo-app
+```
+
+---
+
+# 📝 Task Submission Guidelines
+
+The task was completed using free tools and technologies.
+
+The project contains:
+
+- Source code
+- Docker configuration
+- GitHub Actions workflow
+- README documentation
+- CI/CD implementation
+
+The complete project is maintained in the GitHub repository.
+
+---
+
+# 🎯 Learning Outcome
+
+After completing this task, I gained practical understanding of:
+
+1. Creating a CI/CD pipeline using GitHub Actions.
+2. Automating Node.js application testing.
+3. Creating Docker images.
+4. Using Docker Hub as a container image registry.
+5. Using GitHub Secrets for credentials.
+6. Automating Docker image deployment.
+7. Understanding GitHub Actions runners, jobs, and steps.
+8. Troubleshooting CI/CD pipeline failures.
+
+---
+
+# 🎉 Conclusion
+
+This task demonstrates a complete CI/CD workflow for a Node.js application using GitHub Actions and Docker.
+
+The application source code is maintained in GitHub, GitHub Actions automatically builds and tests the application, Docker packages the application into a container, and the resulting Docker image is pushed to Docker Hub.
+
+The final workflow is:
+
+```text
+GitHub
+   |
+   v
+GitHub Actions
+   |
+   v
+Build
+   |
+   v
+Test
+   |
+   v
+Docker Build
+   |
+   v
+Docker Hub
+   |
+   v
+Deployment
+```
+
+## ✅ Task 1 Completed
+
+**Automate Code Deployment Using CI/CD Pipeline with GitHub Actions**
