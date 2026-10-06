@@ -1,492 +1,254 @@
-\# Task 2 – CI/CD with Jenkins and Docker
+# Task 2 – Jenkins CI/CD with Docker
 
+## 📌 Overview
 
+This task demonstrates the implementation of a **CI/CD pipeline using Jenkins and Docker**.
 
-\## 📌 Overview
+The pipeline automates the process of:
 
+**Build → Test → Deploy**
 
+Jenkins builds the Docker image, validates the Nginx configuration, and deploys the application as a Docker container.
 
-This task demonstrates a \*\*CI/CD pipeline using Jenkins and Docker\*\*.
+---
 
+## 🛠️ Technologies Used
 
+| Technology | Purpose |
+|---|---|
+| **Jenkins** | CI/CD automation |
+| **Docker** | Application containerization |
+| **Nginx** | Web server |
+| **Git** | Version control |
+| **GitHub** | Source code repository |
 
-The Jenkins pipeline automatically builds a Docker image, tests the application, and deploys the container.
+---
 
-
-
-\---
-
-
-
-\## 🛠️ Technologies Used
-
-
-
-\- Jenkins
-
-\- Docker
-
-\- Dockerfile
-
-\- Nginx
-
-\- Git
-
-\- GitHub
-
-
-
-\---
-
-
-
-\## 📂 Project Structure
-
-
+## 📂 Project Structure
 
 ```text
-
 Task2/
-
+│
 ├── app/
-
+│
 ├── Dockerfile
-
+│
 ├── Jenkinsfile
-
+│
 └── README.md
-
 ```
 
+---
 
-
-\---
-
-
-
-\## 🔄 CI/CD Workflow
-
-
+## 🔄 CI/CD Workflow
 
 ```text
-
-Developer
-
-&#x20;   │
-
-&#x20;   │ Push Code
-
-&#x20;   ▼
-
-GitHub Repository
-
-&#x20;   │
-
-&#x20;   ▼
-
-Jenkins
-
-&#x20;   │
-
-&#x20;   ├── Build
-
-&#x20;   │     └── Build Docker Image
-
-&#x20;   │
-
-&#x20;   ├── Test
-
-&#x20;   │     └── Test Nginx Configuration
-
-&#x20;   │
-
-&#x20;   └── Deploy
-
-&#x20;         └── Run Docker Container
-
-&#x20;                │
-
-&#x20;                ▼
-
-&#x20;         Application Running
-
+                    ┌──────────────────┐
+                    │    Developer     │
+                    └────────┬─────────┘
+                             │
+                             │ Push Code
+                             ▼
+                    ┌──────────────────┐
+                    │      GitHub      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     Jenkins      │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+        ┌──────────┐   ┌──────────┐   ┌──────────┐
+        │  Build   │ → │   Test   │ → │  Deploy  │
+        └──────────┘   └──────────┘   └─────┬────┘
+                                            │
+                                            ▼
+                                    ┌──────────────┐
+                                    │    Docker    │
+                                    │   Container  │
+                                    └──────┬───────┘
+                                           │
+                                           ▼
+                                  localhost:8082
 ```
 
+---
 
+## ⚙️ Jenkins Pipeline
 
-\---
-
-
-
-\## ⚙️ Jenkins Pipeline
-
-
-
-The Jenkins pipeline is defined in:
-
-
+The Jenkins pipeline is defined in the:
 
 ```text
-
 Jenkinsfile
-
 ```
 
+The pipeline consists of three stages.
 
+### 1️⃣ Build
 
-The pipeline contains three stages:
-
-
-
-\### 1. Build
-
-
-
-Builds the Docker image using the Task2 Dockerfile.
-
-
+The Docker image is built using the Task2 Dockerfile.
 
 ```cmd
-
 docker build -t jenkins-cicd-app Task2
-
 ```
 
-
-
-\### 2. Test
-
-
-
-Tests the Nginx configuration inside the Docker container.
-
-
-
-```cmd
-
-docker run --rm jenkins-cicd-app nginx -t
-
-```
-
-
-
-\### 3. Deploy
-
-
-
-Stops the existing container, removes it, and starts a new container.
-
-
-
-```cmd
-
-docker stop jenkins-cicd-app-container || exit 0
-
-docker rm jenkins-cicd-app-container || exit 0
-
-docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app
-
-```
-
-
-
-\---
-
-
-
-\## 🐳 Docker Configuration
-
-
-
-\### Docker Image
-
-
+**Output:**
 
 ```text
-
 jenkins-cicd-app
-
 ```
 
+---
 
+### 2️⃣ Test
 
-\### Docker Container
-
-
-
-```text
-
-jenkins-cicd-app-container
-
-```
-
-
-
-\### Port Mapping
-
-
-
-```text
-
-8082:80
-
-```
-
-
-
-The application is available at:
-
-
-
-```text
-
-http://localhost:8082
-
-```
-
-
-
-\---
-
-
-
-\## ▶️ Run Manually
-
-
-
-\### Step 1 – Build the Docker Image
-
-
+The Nginx configuration is tested inside the Docker container.
 
 ```cmd
-
-docker build -t jenkins-cicd-app Task2
-
-```
-
-
-
-\### Step 2 – Test the Docker Image
-
-
-
-```cmd
-
 docker run --rm jenkins-cicd-app nginx -t
-
 ```
 
+This verifies that the Nginx configuration is valid before deployment.
 
+---
 
-\### Step 3 – Run the Container
+### 3️⃣ Deploy
 
-
+The existing container is stopped and removed before deploying a new container.
 
 ```cmd
-
+docker stop jenkins-cicd-app-container || exit 0
+docker rm jenkins-cicd-app-container || exit 0
 docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app
-
 ```
 
-
-
-\### Step 4 – Access the Application
-
-
-
-Open:
-
-
+The application is then available on:
 
 ```text
-
 http://localhost:8082
-
 ```
 
+---
 
+## 🐳 Docker Configuration
 
-\---
-
-
-
-\## 🔧 Jenkins Configuration
-
-
-
-Jenkins uses the `Jenkinsfile` located inside the `Task2` folder.
-
-
-
-The pipeline follows:
-
-
+### Docker Image
 
 ```text
-
-Build → Test → Deploy
-
+jenkins-cicd-app
 ```
 
-
-
-\### Build
-
-
+### Docker Container
 
 ```text
-
-Dockerfile → Docker Image
-
+jenkins-cicd-app-container
 ```
 
-
-
-\### Test
-
-
+### Port Mapping
 
 ```text
-
-Docker Image → Nginx Configuration Test
-
+8082:80
 ```
 
+| Host Port | Container Port | Purpose |
+|---:|---:|---|
+| 8082 | 80 | Nginx Web Server |
 
+---
 
-\### Deploy
+## ▶️ Run the Project Manually
 
+### Build the Docker Image
 
+Run from the repository root:
+
+```cmd
+docker build -t jenkins-cicd-app Task2
+```
+
+### Test the Image
+
+```cmd
+docker run --rm jenkins-cicd-app nginx -t
+```
+
+### Start the Container
+
+```cmd
+docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app
+```
+
+### Access the Application
+
+Open your browser and visit:
 
 ```text
-
-Docker Image → Docker Container → Application
-
+http://localhost:8082
 ```
 
+---
 
-
-\---
-
-
-
-\## 📋 Jenkinsfile
-
-
+## 📋 Jenkinsfile
 
 ```groovy
-
 pipeline {
+    agent any
 
-&#x20;   agent any
+    stages {
 
+        stage('Build') {
+            steps {
+                bat 'docker build -t jenkins-cicd-app Task2'
+            }
+        }
 
+        stage('Test') {
+            steps {
+                bat 'docker run --rm jenkins-cicd-app nginx -t'
+            }
+        }
 
-&#x20;   stages {
-
-
-
-&#x20;       stage('Build') {
-
-&#x20;           steps {
-
-&#x20;               bat 'docker build -t jenkins-cicd-app Task2'
-
-&#x20;           }
-
-&#x20;       }
-
-
-
-&#x20;       stage('Test') {
-
-&#x20;           steps {
-
-&#x20;               bat 'docker run --rm jenkins-cicd-app nginx -t'
-
-&#x20;           }
-
-&#x20;       }
-
-
-
-&#x20;       stage('Deploy') {
-
-&#x20;           steps {
-
-&#x20;               bat 'docker stop jenkins-cicd-app-container || exit 0'
-
-&#x20;               bat 'docker rm jenkins-cicd-app-container || exit 0'
-
-&#x20;               bat 'docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app'
-
-&#x20;           }
-
-&#x20;       }
-
-&#x20;   }
-
+        stage('Deploy') {
+            steps {
+                bat 'docker stop jenkins-cicd-app-container || exit 0'
+                bat 'docker rm jenkins-cicd-app-container || exit 0'
+                bat 'docker run -d --name jenkins-cicd-app-container -p 8082:80 jenkins-cicd-app'
+            }
+        }
+    }
 }
-
 ```
 
+---
 
+## 🎯 Objectives
 
-\---
+- Automate application deployment using Jenkins
+- Build Docker images through a Jenkins pipeline
+- Test the Dockerized Nginx application
+- Automate Docker container deployment
+- Understand Jenkins CI/CD pipeline stages
+- Integrate Jenkins with GitHub
+- Learn Docker-based application deployment
 
+---
 
+## ✅ Result
 
-\## 🎯 Task 2 Objectives
+The Jenkins CI/CD pipeline successfully performs:
 
+```text
+Build
+  ↓
+Test
+  ↓
+Deploy
+```
 
+The application is successfully containerized using Docker and deployed through Jenkins.
 
-\- Learn Jenkins pipeline configuration
+### 🎉 Task 2 Completed
 
-\- Automate Docker image building
-
-\- Test Dockerized applications
-
-\- Automate container deployment
-
-\- Understand CI/CD using Jenkins and Docker
-
-\- Integrate Jenkins with a GitHub repository
-
-
-
-\---
-
-
-
-\## ✅ Result
-
-
-
-The Task2 CI/CD pipeline successfully:
-
-
-
-\- ✅ Builds the Docker image
-
-\- ✅ Tests the Nginx configuration
-
-\- ✅ Stops the previous container
-
-\- ✅ Removes the previous container
-
-\- ✅ Deploys a new Docker container
-
-\- ✅ Makes the application available on port `8082`
-
-
-
-\---
-
-
-
-\## 🎯 Task Status
-
-
-
-\*\*Task 2 CI/CD: Completed ✅\*\*
-
+**Jenkins + Docker CI/CD Pipeline: ✅ Completed**
