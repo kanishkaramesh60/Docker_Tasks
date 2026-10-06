@@ -5,7 +5,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'docker build -t jenkins-cicd-app .'
+                bat 'docker build -t jenkins-cicd-app Task2'
             }
         }
 
